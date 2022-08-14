@@ -185,7 +185,10 @@
             function redVal(magnitude){
                 let redVal = 0;
                 if(magnitude < 0.6){
-                    redVal = -255 * Math.log(magnitude + 0.4);
+                    redVal = 255;
+                }
+                else if(magnitude < 2.3){
+                    redVal = -255 * (Math.log(magnitude + 0.4) - 1);
                 } else {
                     redVal = 0;
                 }
@@ -200,6 +203,8 @@
                     greenVal = 255;
                 } else if(magnitude < 6.9){
                     greenVal = -255 * (Math.log(magnitude + 0.4) - 2);
+                } else {
+                    greenVal = 0;
                 }
                 return greenVal;
 

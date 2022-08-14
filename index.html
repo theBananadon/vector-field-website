@@ -66,7 +66,7 @@
                 iHat = iHat.replaceAll("y", "(y)");
                 iHat = iHat.replaceAll("x", x);
                 iHat = iHat.replaceAll("y" , y);
-                let c = eval(iHat);
+                let c = math.evaluate(iHat);
                 return c;
             }
 
@@ -76,7 +76,7 @@
                 jHat = jHat.replaceAll("y", "(y)");
                 jHat = jHat.replaceAll("x", x);
                 jHat = jHat.replaceAll("y" , y);
-                let c = eval(jHat);
+                let c = math.evaluate(jHat);
                 return c;
             }
 
@@ -132,6 +132,7 @@
                         let dX = VectorXCord(X , Y);
                         let dY = VectorYCord(X , Y);
                         let theta = Math.atan(dY / dX);
+                        let magnitude = Math.sqrt(dX * dX + dY * dY);
                         
                         if(dX < 0 && dY >= 0){
                             theta = Math.PI - Math.abs(theta);
@@ -141,15 +142,14 @@
                             theta = 2 * Math.PI - Math.abs(theta);
                         }
                         
+                        console.log(blueVal(magnitude))
                         ctx.strokeStyle = `rgb(
-                            0,
-                            ${Math.floor(255 - 42.5 * i)},
-                            ${Math.floor(255 - 42.5 * j)})`;
+                            ${redVal(magnitude)},
+                            ${greenVal(magnitude)},
+                            ${blueVal(magnitude)}`;
                         
                         
                         
-                        console.log(theta + " | " + dX + " | " + dY);
-
                         let ctxX = inverseScaleFactor * X + width / 2;
                         let ctxY = inverseScaleFactor * Y + height / 2;
                         let sizeX = inverseScaleFactor * Math.cos(theta) / 2;
@@ -182,15 +182,39 @@
                 } 
             }
 
-            function redVal(dX , dY){
+            function redVal(magnitude){
+                let redVal = 0;
+                if(magnitude < 0.6){
+                    redVal = -255 * Math.log(magnitude + 0.4);
+                } else {
+                    redVal = 0;
+                }
+                return redVal;
+            }
+
+            function greenVal(magnitude){
+                let greenVal = 0;
+                if(magnitude < 0.6){
+                    greenVal = 255 + 255 * Math.log(magnitude + 0.4);
+                } else if(magnitude < 2.3){
+                    greenVal = 255;
+                } else if(magnitude < 6.9){
+                    greenVal = -255 * (Math.log(magnitude + 0.4) - 2);
+                }
+                return greenVal;
 
             }
 
-            function greenVal(dX , dY){
-
-            }
-
-            function blueVal(dX , dY){
+            function blueVal(magnitude){
+                let blueVal = 0;
+                if(magnitude < 0.6){
+                    blueVal = 0;
+                } else if(magnitude < 2.3){
+                    255 + 255 * (Math.log(magnitude + 0.4) - 1); 
+                } else {
+                    blueVal = 255;
+                }
+                return blueVal;
                 
             }
 

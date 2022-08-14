@@ -38,9 +38,23 @@
 
             draw();
 
-            inputX.addEventListener('change', function(e){
+            inputX.addEventListener('input', function(e){
 
+                try{
+                    draw();
+                } catch (e){
 
+                }
+
+            });
+
+            inputY.addEventListener('input', function(e){
+
+                try{
+                    draw();
+                } catch (e){
+
+                }
 
             });
 
@@ -49,8 +63,8 @@
             function VectorXCord( x , y ) {
                 let iHat = inputX.value;
                 iHat = iHat.replaceAll("x", "(x)");
-                iHat = iHat.replaceAll("x", x);
                 iHat = iHat.replaceAll("y", "(y)");
+                iHat = iHat.replaceAll("x", x);
                 iHat = iHat.replaceAll("y" , y);
                 let c = eval(iHat);
                 return c;
@@ -59,8 +73,8 @@
             function VectorYCord( x , y ) {
                 let jHat = inputY.value;
                 jHat = jHat.replaceAll("x", "(x)");
-                jHat = jHat.replaceAll("x", x);
                 jHat = jHat.replaceAll("y", "(y)");
+                jHat = jHat.replaceAll("x", x);
                 jHat = jHat.replaceAll("y" , y);
                 let c = eval(jHat);
                 return c;
@@ -115,12 +129,49 @@
                     for(let j = 0; j < 25; j++){
                         let X = 10 * (i * interval - width / 2) / width;
                         let Y = 10 * ((height / 2) - j * interval) / height;
-                        console.log(X + " | " + Y);
-                        console.log(inverseScaleFactor * X + " | " + inverseScaleFactor * Y);
+                        let dX = VectorXCord(X , Y);
+                        let dY = VectorYCord(X , Y);
+                        let theta = Math.atan(dY / dX);
+                        
+                        if(dX < 0 && dY >= 0){
+                            theta = Math.PI - Math.abs(theta);
+                        } else if(dX < 0 && dY < 0){
+                            theta = Math.PI + Math.abs(theta);
+                        } else if(dX >= 0 && dY <= 0){
+                            theta = 2 * Math.PI - Math.abs(theta);
+                        }
+                        
+                        
+                        
+                        console.log(theta + " | " + dX + " | " + dY);
+
+                        let ctxX = inverseScaleFactor * X + width / 2;
+                        let ctxY = inverseScaleFactor * Y + height / 2;
+                        let sizeX = inverseScaleFactor * Math.cos(theta) / 2;
+                        let sizeY = inverseScaleFactor * Math.sin(theta) / 2;
+                        let arrowX1 = inverseScaleFactor * Math.cos(theta + Math.PI / 6) / 5;
+                        let arrowY1 = inverseScaleFactor * Math.sin(theta + Math.PI / 6) / 5;
+                        let arrowX2 = inverseScaleFactor * Math.cos(theta - Math.PI / 6) / 5;
+                        let arrowY2 = inverseScaleFactor * Math.sin(theta - Math.PI / 6) / 5;
+
+
+                        //Draw 1/2 normalized vectors 
 
                         ctx.beginPath();
-                        ctx.moveTo(inverseScaleFactor * X + width / 2, inverseScaleFactor * Y + height / 2);
-                        ctx.lineTo(inverseScaleFactor * (X + VectorXCord(X , Y)), inverseScaleFactor * (Y - VectorYCord(X , Y)));
+                        ctx.moveTo(ctxX, ctxY);
+                        ctx.lineTo(ctxX + sizeX, ctxY + sizeY);
+                        ctx.stroke();
+
+                        //Draw arrows of vectors
+
+                        ctx.beginPath();
+                        ctx.moveTo(ctxX + sizeX, ctxY + sizeY);
+                        ctx.lineTo(ctxX + sizeX - arrowX1, ctxY + sizeY - arrowY1);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.moveTo(ctxX + sizeX, ctxY + sizeY);
+                        ctx.lineTo(ctxX + sizeX - arrowX2, ctxY + sizeY - arrowY2);
                         ctx.stroke();
                     }
                 } 

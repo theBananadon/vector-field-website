@@ -141,6 +141,11 @@
                             theta = 2 * Math.PI - Math.abs(theta);
                         }
                         
+                        ctx.strokeStyle = `rgb(
+                            0,
+                            ${Math.floor(255 - 42.5 * i)},
+                            ${Math.floor(255 - 42.5 * j)})`;
+                        
                         
                         
                         console.log(theta + " | " + dX + " | " + dY);
@@ -177,6 +182,17 @@
                 } 
             }
 
+            function redVal(dX , dY){
+
+            }
+
+            function greenVal(dX , dY){
+
+            }
+
+            function blueVal(dX , dY){
+                
+            }
 
         </script>
 

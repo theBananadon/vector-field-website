@@ -16,7 +16,19 @@
             <canvas id = 'field' height = '600' width = '600'>
                  
             </canvas>
-            <div class = 'theDiv'>Hello Nerd</div>
+            <canvas id = "point"></canvas>
+            <div class = 'location'>
+                
+                (
+                <span class = 'xLocation'>
+
+                </span>
+                ,
+                <span class = 'yLocation'>
+
+                </span>
+                )
+            </div>
         </div>
 
 
@@ -24,8 +36,15 @@
 
         <script type = "text/javascript">
 
+            const canvas = document.querySelector("#field");
+            const point = document.querySelector("#point");
+            let rect = canvas.getBoundingClientRect();
+
             const functionX = document.querySelector(".functionX");
             const functionY = document.querySelector(".functionY");
+            const pointer = document.querySelector(".location");
+            const pointerX = document.querySelector(".xLocation");
+            const pointerY = document.querySelector(".yLocation");
 
             const inputX = document.createElement("input");
             inputX.setAttribute("type", "text");
@@ -35,8 +54,18 @@
             inputY.setAttribute("type", "text");
             inputY.value = "x";
 
+            const localX = document.createElement("input");
+            localX.setAttribute("type", "text");
+            localX.value = "0";
+
+            const localY = document.createElement("input");
+            localY.setAttribute("type", "text");
+            localY.value = "0";
+
             functionX.appendChild(inputX);
             functionY.appendChild(inputY);
+            pointerX.appendChild(localX);
+            pointerY.appendChild(localY);
 
             draw();
 
@@ -60,6 +89,16 @@
 
             });
 
+            localX.addEventListener('input', function(e){
+
+                
+
+                try{
+                    pointer.style.left = (10 * ((localX.value - rect.left) - canvas.width / 2) / canvas.width).toFixed(3);
+                } catch (e){
+
+                }
+            })
             
 
             function VectorXCord( x , y ) {
@@ -81,6 +120,8 @@
                 let c = math.evaluate(jHat);
                 return c;
             }
+
+            
 
             function draw() {
 
@@ -104,6 +145,10 @@
                 drawVectors(ctx, width, height);
 
             }   
+
+            function drawPoint(ctx, width, height){
+                
+            }
             
             function drawGraphLines(ctx, width, height){
 
@@ -185,6 +230,8 @@
             } 
             
 
+            //Finding RGB Values using ln(x) function
+
             function redVal(magnitude){
                 let redVal = 0;
                 if(magnitude < 0.6){
@@ -229,11 +276,11 @@
 
 
 
-            dragElement(document.querySelector(".theDiv"));
+            dragElement(pointer);
 
             function dragElement(elmnt) {
 
-                var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
                 
                 const canvas = document.querySelector("#field");
 
@@ -261,7 +308,7 @@
                     pos3 = e.clientX;
                     pos4 = e.clientY;
 
-                    let rect = canvas.getBoundingClientRect();
+                    
                     
 
                     if(pos3 >= rect.right){
@@ -278,6 +325,17 @@
                     // set the element's new position:
                     elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
                     elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+
+                    //label the point
+
+                    let canvasPosX = (10 * ((elmnt.offsetLeft - pos1 - rect.left) - canvas.width / 2) / canvas.width).toFixed(3);
+                    let canvasPosY = (10 * (canvas.height / 2 - (elmnt.offsetTop - pos2 - rect.top)) / canvas.height).toFixed(3);
+
+                    localX.value = canvasPosX;
+                    localY.value = canvasPosY;
+                    
+
+
                 }
 
                 function closeDragElement() {

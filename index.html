@@ -281,7 +281,7 @@
 
 
 
-            dragElement(pointer);
+            dragElement(point);
 
             function dragElement(elmnt) {
 
@@ -308,28 +308,30 @@
                     e = e || window.event;
                     e.preventDefault();
                     // calculate the new cursor position:
-                    pos1 = pos3 - e.clientX;
-                    pos2 = pos4 - e.clientY;
-                    pos3 = e.clientX;
-                    pos4 = e.clientY;
+                    pos3 = e.clientX - 10;
+                    pos4 = e.clientY - 10;
 
                     
                     
 
-                    if(pos3 >= rect.right){
-                        pos1 = 0;
-                    } else if(pos3 <= rect.left){
-                        pos1 = 0;
+                    if(pos3 >= rect.right - 8){
+                        pos3 = rect.right - 8;
+                    } else if(pos3 <= rect.left - 8){
+                        pos3 = rect.left - 8;
                     }
-                    if(pos4 >= rect.bottom){
-                        pos2 = 0;
-                    } else if(pos4 <= rect.top){
-                        pos2 = 0;
+                    if(pos4 >= rect.bottom + rect.top / 2){
+                        pos4 = rect.bottom + rect.top / 2;
+                    } else if(pos4 <= rect.top + rect.top / 2){
+                        pos4 = rect.top + rect.top / 2;
                     }
                     
                     // set the element's new position:
-                    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-                    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                    elmnt.style.top = (pos4) + "px";
+                    elmnt.style.left = (pos3) + "px";
+
+
+                    localX.value = (10 * (pos3 - canvas.width / 2) / canvas.width).toFixed(3);
+                    localY.value = (10 * (3 * rect.top / 2 + canvas.height / 2 - pos4 ) / canvas.height).toFixed(3);
                     
                     
 

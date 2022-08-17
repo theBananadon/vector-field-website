@@ -16,18 +16,11 @@
             <canvas id = 'field' height = '600' width = '600'>
                  
             </canvas>
-            <canvas id = "point"></canvas>
-            <div class = 'location'>
-                
-                (
-                <span class = 'xLocation'>
-
-                </span>
-                ,
-                <span class = 'yLocation'>
-
-                </span>
-                )
+            <canvas id = "point" height = '20' width = '20'></canvas>
+            
+            <div>
+                <span class = 'xLocation'></span>
+                <span class = 'yLocation'></span>
             </div>
         </div>
 
@@ -127,6 +120,8 @@
 
                 const canvas = document.querySelector("#field");
 
+                const pointerCanvas = document.querySelector('#point');
+
                 if(!canvas.getContext){
                     return;
                 }
@@ -136,6 +131,8 @@
 
                 const ctx = canvas.getContext('2d');
 
+                const ptx = pointerCanvas.getContext('2d');
+
                 ctx.clearRect(0, 0, width, height);
 
                 //Draw vector lines here
@@ -144,9 +141,17 @@
 
                 drawVectors(ctx, width, height);
 
+                drawPoint(ptx, 20, 20);
+
             }   
 
-            function drawPoint(ctx, width, height){
+            function drawPoint(ptx, width, height){
+                ptx.strokeStyle = 'black';
+                
+                ptx.beginPath();
+                ptx.arc(width / 2, height / 2, width / 2, 0, 2 * Math.PI, false);
+                ptx.fillStyle = 'black';
+                ptx.fill();
                 
             }
             
@@ -325,14 +330,7 @@
                     // set the element's new position:
                     elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
                     elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-
-                    //label the point
-
-                    let canvasPosX = (10 * ((elmnt.offsetLeft - pos1 - rect.left) - canvas.width / 2) / canvas.width).toFixed(3);
-                    let canvasPosY = (10 * (canvas.height / 2 - (elmnt.offsetTop - pos2 - rect.top)) / canvas.height).toFixed(3);
-
-                    localX.value = canvasPosX;
-                    localY.value = canvasPosY;
+                    
                     
 
 

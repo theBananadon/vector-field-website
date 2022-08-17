@@ -1,15 +1,13 @@
-#field{
-    position: absolute;
-}
 
-.location{
+#point{
     position: absolute;
-    left: 200px;
-    top: 300px;
-    background-color: aqua;
+    left: 300px;
+    top: 200px;
+    background-color: transparent;
     z-index: 1;
 }
 
 input[type = 'text']{
     width: 50px;
 }
+

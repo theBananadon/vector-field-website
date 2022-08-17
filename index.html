@@ -22,6 +22,10 @@
                 <span class = 'xLocation'></span>
                 <span class = 'yLocation'></span>
             </div>
+            <div class = 'divAndCurl'>
+                <span class = 'divergence'></span>
+                <span class = 'curl'></span>
+            </div>
         </div>
 
 
@@ -55,10 +59,21 @@
             localY.setAttribute("type", "text");
             localY.value = "0";
 
+            const divergence = document.createElement("input");
+            divergence.setAttribute("type", "text");
+            divergence.value = "N/A";
+
+            const curl = document.createElement("input");
+            curl.setAttribute("type", "text");
+            curl.value = "N/A";
+
+
             functionX.appendChild(inputX);
             functionY.appendChild(inputY);
             pointerX.appendChild(localX);
             pointerY.appendChild(localY);
+            document.querySelector(".divergence").appendChild(divergence);
+            document.querySelector(".curl").appendChild(curl);
 
             draw();
 
@@ -84,15 +99,37 @@
 
             localX.addEventListener('input', function(e){
 
-                
-
                 try{
-                    pointer.style.left = (10 * ((localX.value - rect.left) - canvas.width / 2) / canvas.width).toFixed(3);
+                    point.style.left = (canvas.width * ((localX.value)) / 10 + canvas.width / 2).toFixed(3) + 'px';
+                    updateDivergence(localX.value , localY.value);
+                    updateCurl(localX.value , localY.value);
                 } catch (e){
 
                 }
-            })
+            });
             
+            localY.addEventListener('input', function(e){
+                try{
+                    point.style.top = ( - canvas.width * ((localY.value)) / 10 + canvas.height / 2 + 3 * rect.top / 2).toFixed(3) + 'px';
+                    updateDivergence(localX.value , localY.value);
+                    updateCurl(localX.value , localY.value);
+                } catch (e){
+
+                }
+            });
+
+
+            function updateDivergence( X , Y ){
+                let f_x = math.derivative(inputX.value , 'x' ).evaluate({x: X, y: Y});
+                let f_y = math.derivative(inputY.value , 'y' ).evaluate({x: X, y: Y});
+                divergence.value = f_x + f_y;
+            }
+
+            function updateCurl( X , Y ){
+                let P_y = math.derivative(inputX.value , 'y').evaluate({x: X, y: Y});
+                let Q_x = math.derivative(inputY.value , 'x').evaluate({x: X, y: Y});
+                curl.value = Q_x - P_y;
+            }
 
             function VectorXCord( x , y ) {
                 let iHat = inputX.value;
@@ -332,6 +369,9 @@
 
                     localX.value = (10 * (pos3 - canvas.width / 2) / canvas.width).toFixed(3);
                     localY.value = (10 * (3 * rect.top / 2 + canvas.height / 2 - pos4 ) / canvas.height).toFixed(3);
+
+                    updateDivergence(localX.value , localY.value);
+                    updateCurl(localX.value , localY.value);
                     
                     
 

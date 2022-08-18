@@ -11,20 +11,42 @@
 
         <div id = 'main'>
             <h3 class = 'title'>Vector Field Plotter</h3>
-            <div class = 'functionX'></div>
-            <div class = 'functionY'></div>
-            <canvas id = 'field' height = '600' width = '600'>
-                 
-            </canvas>
-            <canvas id = "point" height = '20' width = '20'></canvas>
+            <div class = 'fieldFunctions'>
+                (
+                <span class = 'functionX'></span>
+                ,
+                <span class = 'functionY'></span>
+                )
+            </div>
+            <div class = 'parameterization'>
+                (
+                <span class = 'xParameter'></span>
+                ,
+                <span class = 'yParameter'></span>
+                ) from 
+                <span class = 'lowerDomain'></span>
+                &lt; t &lt;
+                <span class = 'upperDomain'></span>
+            </div>
+            <canvas id = 'field' height = '600' width = '600'></canvas>
+
+            <canvas id = "point" height = '10' width = '10'></canvas>
             
             <div>
+                (
                 <span class = 'xLocation'></span>
+                ,
                 <span class = 'yLocation'></span>
+                ) 
             </div>
+            
             <div class = 'divAndCurl'>
                 <span class = 'divergence'></span>
                 <span class = 'curl'></span>
+            </div>
+            <div class = 'fluxAndCirc'>
+                <span class = 'flux'></span>
+                <span class = 'circ'></span>
             </div>
         </div>
 
@@ -42,6 +64,23 @@
             const pointer = document.querySelector(".location");
             const pointerX = document.querySelector(".xLocation");
             const pointerY = document.querySelector(".yLocation");
+            
+            
+            const paraX = document.createElement("input");
+            paraX.setAttribute("type", "text");
+            paraX.value = "t";
+
+            const paraY = document.createElement("input");
+            paraY.setAttribute("type", "text");
+            paraY.value = "t";
+
+            const lB = document.createElement("input");
+            lB.setAttribute("type", "text");
+            lB.value = -1;
+
+            const uB = document.createElement("input");
+            uB.setAttribute("type", "text");
+            uB.value = 1;
 
             const inputX = document.createElement("input");
             inputX.setAttribute("type", "text");
@@ -74,6 +113,10 @@
             pointerY.appendChild(localY);
             document.querySelector(".divergence").appendChild(divergence);
             document.querySelector(".curl").appendChild(curl);
+            document.querySelector(".xParameter").appendChild(paraX);
+            document.querySelector(".yParameter").appendChild(paraY);
+            document.querySelector(".lowerDomain").appendChild(lB);
+            document.querySelector(".upperDomain").appendChild(uB);
 
             draw();
 
@@ -118,17 +161,59 @@
                 }
             });
 
+            paraX.addEventListener('input', function(e){
+                try{
+
+                }catch(e){
+
+                }
+            });
+
+            paraY.addEventListener('input', function(e){
+                try{
+
+                }catch(e){
+                    
+                }
+            });
+
 
             function updateDivergence( X , Y ){
-                let f_x = math.derivative(inputX.value , 'x' ).evaluate({x: X, y: Y});
-                let f_y = math.derivative(inputY.value , 'y' ).evaluate({x: X, y: Y});
-                divergence.value = f_x + f_y;
+                try{
+                    let f_x = inputX.value.replaceAll('x' , '(x)');
+                    f_x = f_x.replaceAll('y' , '(y)');
+                    f_x = math.derivative(f_x , 'x' ).evaluate({x: X, y: Y});
+                    let f_y = inputY.value.replaceAll('x' , '(x)');
+                    f_y = f_y.replaceAll('y' , '(y)');
+                    f_y = math.derivative(f_y , 'y' ).evaluate({x: X, y: Y});
+                    divergence.value = f_x + f_y;
+                } catch (e){
+                    divergence.value = "!";
+                }
             }
 
             function updateCurl( X , Y ){
-                let P_y = math.derivative(inputX.value , 'y').evaluate({x: X, y: Y});
-                let Q_x = math.derivative(inputY.value , 'x').evaluate({x: X, y: Y});
-                curl.value = Q_x - P_y;
+                try{
+                    let P_y = inputX.value.replaceAll('x' , '(x)');
+                    P_y = P_y.replaceAll('y' , '(y)');
+                    P_y = math.derivative(P_y , 'y' ).evaluate({x: X, y: Y});
+                    let Q_x = inputY.value.replaceAll('x' , '(x)');
+                    Q_x = Q_x.replaceAll('y' , '(y)');
+                    Q_x = math.derivative(Q_x , 'x' ).evaluate({x: X, y: Y});
+                    curl.value = Q_x - P_y;
+                } catch (e){
+                    curl.value = "!";
+                }
+            }
+
+            function solveFlux(){
+                let F_x = inputX.value;
+                let F_y = inputY.value;
+
+                let n_x = - math.derivative(paraY , 't');
+                let n_y = math.derivative(paraX , 't');
+
+                
             }
 
             function VectorXCord( x , y ) {
@@ -136,7 +221,7 @@
                 iHat = iHat.replaceAll("x", "(x)");
                 iHat = iHat.replaceAll("y", "(y)");
                 iHat = iHat.replaceAll("x", x);
-                iHat = iHat.replaceAll("y" , y);
+                iHat = iHat.replaceAll("y", y);
                 let c = math.evaluate(iHat);
                 return c;
             }
@@ -178,7 +263,7 @@
 
                 drawVectors(ctx, width, height);
 
-                drawPoint(ptx, 20, 20);
+                drawPoint(ptx, 10, 10);
 
             }   
 
@@ -345,8 +430,8 @@
                     e = e || window.event;
                     e.preventDefault();
                     // calculate the new cursor position:
-                    pos3 = e.clientX - 10;
-                    pos4 = e.clientY - 10;
+                    pos3 = e.clientX - 5;
+                    pos4 = e.clientY - 5;
 
                     
                     

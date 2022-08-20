@@ -41,8 +41,6 @@
             </div>
             
             <div class = 'divAndCurl'>
-                <span class = 'divergence'></span>
-                <span class = 'curl'></span>
             </div>
             <div class = 'fluxAndCirc'>
                 <span class = 'flux'></span>
@@ -76,11 +74,11 @@
 
             const lB = document.createElement("input");
             lB.setAttribute("type", "text");
-            lB.value = -1;
+            lB.value = '0';
 
             const uB = document.createElement("input");
             uB.setAttribute("type", "text");
-            uB.value = 1;
+            uB.value = '1';
 
             const inputX = document.createElement("input");
             inputX.setAttribute("type", "text");
@@ -98,21 +96,19 @@
             localY.setAttribute("type", "text");
             localY.value = "0";
 
-            const divergence = document.createElement("input");
-            divergence.setAttribute("type", "text");
-            divergence.value = "N/A";
+            const divergence = document.createElement("span");
+            divergence.innerHTML = "∇ ⋅ F = N/A | ";
 
-            const curl = document.createElement("input");
-            curl.setAttribute("type", "text");
-            curl.value = "N/A";
+            const curl = document.createElement("span");
+            curl.innerHTML = "∇ × F = N/A";
 
 
             functionX.appendChild(inputX);
             functionY.appendChild(inputY);
             pointerX.appendChild(localX);
             pointerY.appendChild(localY);
-            document.querySelector(".divergence").appendChild(divergence);
-            document.querySelector(".curl").appendChild(curl);
+            document.querySelector(".divAndCurl").appendChild(divergence);
+            document.querySelector(".divAndCurl").appendChild(curl);
             document.querySelector(".xParameter").appendChild(paraX);
             document.querySelector(".yParameter").appendChild(paraY);
             document.querySelector(".lowerDomain").appendChild(lB);
@@ -146,6 +142,11 @@
                     point.style.left = (canvas.width * ((localX.value)) / 10 + canvas.width / 2).toFixed(3) + 'px';
                     updateDivergence(localX.value , localY.value);
                     updateCurl(localX.value , localY.value);
+                    if(localX.value > 5 || localX.value < -5 || localY.value > 5 || localY.value < -5){
+                        point.style.opacity = '0';
+                    } else {
+                        point.style.opacity = '1';
+                    }
                 } catch (e){
 
                 }
@@ -153,9 +154,14 @@
             
             localY.addEventListener('input', function(e){
                 try{
-                    point.style.top = ( - canvas.width * ((localY.value)) / 10 + canvas.height / 2 + 3 * rect.top / 2).toFixed(3) + 'px';
+                    point.style.top = ( - canvas.width * ((localY.value)) / 10 + canvas.height / 2 + 2 * rect.top / 2).toFixed(3) + 'px';
                     updateDivergence(localX.value , localY.value);
                     updateCurl(localX.value , localY.value);
+                    if(localY.value > 5 || localY.value < -5 || localX.value > 5 || localX.value < -5){
+                        point.style.opacity = '0';
+                    } else {
+                        point.style.opacity = '1';
+                    }
                 } catch (e){
 
                 }
@@ -163,7 +169,7 @@
 
             paraX.addEventListener('input', function(e){
                 try{
-
+                    draw();
                 }catch(e){
 
                 }
@@ -171,9 +177,25 @@
 
             paraY.addEventListener('input', function(e){
                 try{
-
+                    draw();
                 }catch(e){
                     
+                }
+            });
+
+            lB.addEventListener('input', function(e){
+                try{
+                    draw();
+                }catch(e){
+
+                }
+            });
+
+            uB.addEventListener('input', function(e){
+                try{
+                    draw();
+                }catch(e){
+
                 }
             });
 
@@ -186,9 +208,9 @@
                     let f_y = inputY.value.replaceAll('x' , '(x)');
                     f_y = f_y.replaceAll('y' , '(y)');
                     f_y = math.derivative(f_y , 'y' ).evaluate({x: X, y: Y});
-                    divergence.value = f_x + f_y;
+                    divergence.innerHTML = "∇ ⋅ F = " + (f_x + f_y).toFixed(3) + " | ";
                 } catch (e){
-                    divergence.value = "!";
+                    divergence.innerHTML = "∇ ⋅ F = ! | ";
                 }
             }
 
@@ -200,20 +222,45 @@
                     let Q_x = inputY.value.replaceAll('x' , '(x)');
                     Q_x = Q_x.replaceAll('y' , '(y)');
                     Q_x = math.derivative(Q_x , 'x' ).evaluate({x: X, y: Y});
-                    curl.value = Q_x - P_y;
+                    curl.innerHTML ="∇ × F = " +  (Q_x - P_y).toFixed(3);
                 } catch (e){
-                    curl.value = "!";
+                    curl.value = "∇ × F = !";
                 }
             }
 
             function solveFlux(){
+
                 let F_x = inputX.value;
+                F_x = F_x.replaceAll('x' , '(x)');
+                F_x = F_x.replaceAll('y' , '(y)');
                 let F_y = inputY.value;
+                F_y = F_y.replaceAll('x' , '(x)');
+                F_y = F_y.replaceAll('y' , '(y)');
 
-                let n_x = - math.derivative(paraY , 't');
-                let n_y = math.derivative(paraX , 't');
+                let n_x = - math.derivative(paraY.value , 't');
+                n_x = String(n_x).replaceAll('t' , '(t)');
+                let n_y = math.derivative(paraX.value , 't' );
+                n_y = String(n_y).replaceAll('t' , '(t)');
+                let temp = n_x;
+                n_x = n_x + "/sqrt((" + n_x + ")^2" + " + (" + n_y + ")^2)"; 
+                n_y = n_y + "/sqrt((" + temp + ")^2" + " + (" + n_y + ")^2)"; 
 
+
+                let a = Number(lB.value);
+                let flux = 0;
+                const interval = 0.001;
                 
+
+                while(a <= Number(uB.value)){
+                    let b = math.evaluate(paraX.value , {t: a});
+                    let c = math.evaluate(paraY.value , {t: a});
+                    flux += ((math.evaluate(F_x, { x: b , y: c})) * (math.evaluate(n_x , {t: a})) + (math.evaluate(F_y , {x: b, y: c})) * (math.evaluate(n_y , {t: a}))) * interval;
+                    a += interval;
+                    
+                }
+
+                document.querySelector('.flux').innerHTML = flux;
+
             }
 
             function VectorXCord( x , y ) {
@@ -244,6 +291,8 @@
 
                 const pointerCanvas = document.querySelector('#point');
 
+                solveFlux();
+
                 if(!canvas.getContext){
                     return;
                 }
@@ -262,6 +311,8 @@
                 drawGraphLines(ctx, width, height);
 
                 drawVectors(ctx, width, height);
+
+                drawParameter(ctx, width, height);
 
                 drawPoint(ptx, 10, 10);
 
@@ -355,6 +406,39 @@
                     }
                 } 
             } 
+
+            function drawParameter(ctx, width, height){
+                const interval = 0.01;
+                const inverseScaleFactor = width / 10;
+                
+                let a = Number(lB.value);
+                let b = Number(uB.value);
+
+                ctx.strokeStyle = 'rgba(0, 0, 0, 100)';
+                ctx.lineWidth = 1;
+
+                
+
+                
+
+                while(a <= b){
+
+                    let tX0 = inverseScaleFactor * math.evaluate(paraX.value , {t: a}) + width / 2;
+                    let tY0 = -inverseScaleFactor * math.evaluate(paraY.value , {t: a}) + height / 2;
+                    let tX1 = inverseScaleFactor * math.evaluate(paraX.value , {t: a + interval}) + width / 2;
+                    let tY1 = -inverseScaleFactor * math.evaluate(paraY.value , {t: a + interval}) + height / 2;
+
+
+                    ctx.beginPath();
+                    ctx.moveTo(tX0 , tY0);
+                    ctx.lineTo(tX1 , tY1);
+                    ctx.stroke();
+
+                    a += interval;
+                    
+                    
+                }
+            }
             
 
             //Finding RGB Values using ln(x) function
@@ -441,10 +525,10 @@
                     } else if(pos3 <= rect.left - 8){
                         pos3 = rect.left - 8;
                     }
-                    if(pos4 >= rect.bottom + rect.top / 2){
-                        pos4 = rect.bottom + rect.top / 2;
-                    } else if(pos4 <= rect.top + rect.top / 2){
-                        pos4 = rect.top + rect.top / 2;
+                    if(pos4 >= rect.bottom){
+                        pos4 = rect.bottom;
+                    } else if(pos4 <= rect.top){
+                        pos4 = rect.top;
                     }
                     
                     // set the element's new position:
@@ -453,7 +537,7 @@
 
 
                     localX.value = (10 * (pos3 - canvas.width / 2) / canvas.width).toFixed(3);
-                    localY.value = (10 * (3 * rect.top / 2 + canvas.height / 2 - pos4 ) / canvas.height).toFixed(3);
+                    localY.value = (10 * (2 * rect.top / 2 + canvas.height / 2 - pos4 ) / canvas.height).toFixed(3);
 
                     updateDivergence(localX.value , localY.value);
                     updateCurl(localX.value , localY.value);

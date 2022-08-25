@@ -237,29 +237,35 @@
                 F_y = F_y.replaceAll('x' , '(x)');
                 F_y = F_y.replaceAll('y' , '(y)');
 
-                let n_x = - math.derivative(paraY.value , 't');
-                n_x = String(n_x).replaceAll('t' , '(t)');
-                let n_y = math.derivative(paraX.value , 't' );
-                n_y = String(n_y).replaceAll('t' , '(t)');
+                let n_x = String(paraY.value).replaceAll('t' , '(t)');
+                n_x = - math.derivative(n_x , 't');
+                let n_y = String(paraX.value).replaceAll('t' , '(t)');
+                n_y = math.derivative( n_y, 't' );
                 let temp = n_x;
                 n_x = n_x + "/sqrt((" + n_x + ")^2" + " + (" + n_y + ")^2)"; 
                 n_y = n_y + "/sqrt((" + temp + ")^2" + " + (" + n_y + ")^2)"; 
 
 
                 let a = Number(lB.value);
+                let ub = Number(uB.value);
                 let flux = 0;
-                const interval = 0.001;
+                const interval = (ub - a) / 1000;
                 
+                let parameterX = String(paraX.value).replaceAll('t' , '(t)');
+                let parameterY = String(paraY.value).replaceAll('t' , '(t)');
 
-                while(a <= Number(uB.value)){
-                    let b = math.evaluate(paraX.value , {t: a});
-                    let c = math.evaluate(paraY.value , {t: a});
+                while(a < ub){
+                    let b = math.evaluate(parameterX , {t: a});
+                    let c = math.evaluate(parameterY , {t: a});
+                    
                     flux += ((math.evaluate(F_x, { x: b , y: c})) * (math.evaluate(n_x , {t: a})) + (math.evaluate(F_y , {x: b, y: c})) * (math.evaluate(n_y , {t: a}))) * interval;
                     a += interval;
+
+                    //console.log(b + " | " + c);
                     
                 }
 
-                document.querySelector('.flux').innerHTML = flux;
+                document.querySelector('.flux').innerHTML = "∫F⋅n̂ds = " + flux;
 
             }
 
@@ -414,8 +420,12 @@
                 let a = Number(lB.value);
                 let b = Number(uB.value);
 
+                let parameterX = String(paraX.value).replaceAll('t' , '(t)');
+                let parameterY = String(paraY.value).replaceAll('t' , '(t)');
                 ctx.strokeStyle = 'rgba(0, 0, 0, 100)';
                 ctx.lineWidth = 1;
+
+
 
                 
 
@@ -423,10 +433,10 @@
 
                 while(a <= b){
 
-                    let tX0 = inverseScaleFactor * math.evaluate(paraX.value , {t: a}) + width / 2;
-                    let tY0 = -inverseScaleFactor * math.evaluate(paraY.value , {t: a}) + height / 2;
-                    let tX1 = inverseScaleFactor * math.evaluate(paraX.value , {t: a + interval}) + width / 2;
-                    let tY1 = -inverseScaleFactor * math.evaluate(paraY.value , {t: a + interval}) + height / 2;
+                    let tX0 = inverseScaleFactor * math.evaluate(parameterX , {t: a}) + width / 2;
+                    let tY0 = -inverseScaleFactor * math.evaluate(parameterY , {t: a}) + height / 2;
+                    let tX1 = inverseScaleFactor * math.evaluate(parameterX , {t: a + interval}) + width / 2;
+                    let tY1 = -inverseScaleFactor * math.evaluate(parameterY , {t: a + interval}) + height / 2;
 
 
                     ctx.beginPath();
